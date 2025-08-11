@@ -1,3 +1,8 @@
+use App\Http\Controllers\MessageController;
+Route::middleware(['web','tenant'])->group(function () {
+    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+});
 <?php
 
 use Illuminate\Support\Facades\Route;

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\Channels\SmsChannel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +29,10 @@ class AppServiceProvider extends ServiceProvider
         if ($user && isset($user->tenant_id)) {
             app()->instance('tenant.id', (int) $user->tenant_id);
         }
+
+        // Register custom SMS channel
+        Notification::extend('sms', function ($app) {
+            return $app->make(SmsChannel::class);
+        });
     }
 }
