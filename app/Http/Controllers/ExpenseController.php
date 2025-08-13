@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,8 @@ class ExpenseController extends Controller
             'amount' => ['required','numeric','min:0'],
             'description' => ['nullable','string'],
         ]);
-        Expense::create($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    Expense::create($data);
         return redirect()->route('expenses.index')->with('status', 'Expense recorded');
     }
 
@@ -44,7 +46,8 @@ class ExpenseController extends Controller
             'amount' => ['required','numeric','min:0'],
             'description' => ['nullable','string'],
         ]);
-        $expense->update($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    $expense->update($data);
         return redirect()->route('expenses.index')->with('status', 'Expense updated');
     }
 

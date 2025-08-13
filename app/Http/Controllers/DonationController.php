@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donation;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Donor;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -32,7 +33,8 @@ class DonationController extends Controller
             'payment_method' => ['nullable','string','max:50'],
             'status' => ['required','in:pending,completed,refunded'],
         ]);
-        Donation::create($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    Donation::create($data);
         return redirect()->route('donations.index')->with('status', 'Donation recorded');
     }
 
@@ -53,7 +55,8 @@ class DonationController extends Controller
             'payment_method' => ['nullable','string','max:50'],
             'status' => ['required','in:pending,completed,refunded'],
         ]);
-        $donation->update($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    $donation->update($data);
         return redirect()->route('donations.index')->with('status', 'Donation updated');
     }
 

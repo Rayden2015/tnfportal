@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -27,7 +28,8 @@ class ProjectController extends Controller
             'end_date' => ['nullable','date','after_or_equal:start_date'],
             'status' => ['required','in:draft,active,completed,cancelled'],
         ]);
-        Project::create($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    Project::create($data);
         return redirect()->route('projects.index')->with('status', 'Project created');
     }
 
@@ -45,7 +47,8 @@ class ProjectController extends Controller
             'end_date' => ['nullable','date','after_or_equal:start_date'],
             'status' => ['required','in:draft,active,completed,cancelled'],
         ]);
-        $project->update($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    $project->update($data);
         return redirect()->route('projects.index')->with('status', 'Project updated');
     }
 

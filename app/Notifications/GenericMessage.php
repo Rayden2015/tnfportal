@@ -35,6 +35,8 @@ class GenericMessage extends Notification implements ShouldQueue
         $recipient = method_exists($notifiable, 'routeNotificationForMail') ? $notifiable->routeNotificationForMail() : ($notifiable->email ?? null);
 
         MessageLog::create([
+            'notifiable_type' => 'mail',
+            'notifiable_id' => null,
             'channel' => 'mail',
             'recipient' => $recipient,
             'subject' => $this->subject,
@@ -52,6 +54,8 @@ class GenericMessage extends Notification implements ShouldQueue
         $recipient = method_exists($notifiable, 'routeNotificationForSms') ? $notifiable->routeNotificationForSms() : ($notifiable->phone ?? null);
 
         MessageLog::create([
+            'notifiable_type' => 'sms',
+            'notifiable_id' => null,
             'channel' => 'sms',
             'recipient' => $recipient,
             'subject' => $this->subject,

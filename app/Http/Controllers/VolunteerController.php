@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Volunteer;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class VolunteerController extends Controller
@@ -26,6 +27,7 @@ class VolunteerController extends Controller
             'phone' => ['nullable','string','max:30'],
             'notes' => ['nullable','string'],
         ]);
+        $data['tenant_id'] = Auth::user()->tenant_id;
         Volunteer::create($data);
         return redirect()->route('volunteers.index')->with('status', 'Volunteer created');
     }
@@ -43,6 +45,7 @@ class VolunteerController extends Controller
             'phone' => ['nullable','string','max:30'],
             'notes' => ['nullable','string'],
         ]);
+        $data['tenant_id'] = Auth::user()->tenant_id;
         $volunteer->update($data);
         return redirect()->route('volunteers.index')->with('status', 'Volunteer updated');
     }

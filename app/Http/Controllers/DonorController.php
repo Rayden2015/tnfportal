@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class DonorController extends Controller
@@ -25,7 +26,8 @@ class DonorController extends Controller
             'email' => ['nullable','email'],
             'phone' => ['nullable','string','max:30'],
         ]);
-        Donor::create($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    Donor::create($data);
         return redirect()->route('donors.index')->with('status', 'Donor created');
     }
 
@@ -42,7 +44,8 @@ class DonorController extends Controller
             'phone' => ['nullable','string','max:30'],
             'tags' => ['required','string','max:255'],
         ]);
-        $donor->update($data);
+    $data['tenant_id'] = Auth::user()->tenant_id;
+    $donor->update($data);
         return redirect()->route('donors.index')->with('status', 'Donor updated');
     }
 
