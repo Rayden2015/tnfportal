@@ -2,12 +2,12 @@
 
 namespace App\Notifications\Channels;
 
-use App\Services\Sms\SmsSender;
+use App\Services\Sms\HubtelSmsSender;
 use Illuminate\Notifications\Notification;
 
 class SmsChannel
 {
-    public function __construct(private SmsSender $smsSender)
+    public function __construct(private HubtelSmsSender $smsSender)
     {
     }
 

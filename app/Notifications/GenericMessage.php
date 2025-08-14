@@ -7,27 +7,29 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Notifications\Channels\HubtelSmsChannel;
+use App\Services\Sms\HubtelSmsSender;
 
-class GenericMessage extends Notification implements ShouldQueue
+// class GenericMessage extends Notification implements ShouldQueue
+class GenericMessage extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
     public function __construct(
         protected string $subject,
         protected string $body,
+        protected string $channel
     ) {
     }
 
     public function via(object $notifiable): array
     {
-        $channels = [];
-        if (method_exists($notifiable, 'routeNotificationForMail') || isset($notifiable->email)) {
-            $channels[] = 'mail';
+        if ($this->channel === 'mail') {
+            return ['mail'];
+        } elseif ($this->channel === 'sms') {
+            return [\App\Notifications\Channels\HubtelSmsChannel::class];
         }
-        if (method_exists($notifiable, 'routeNotificationForSms') || isset($notifiable->phone)) {
-            $channels[] = 'sms';
-        }
-        return $channels;
+        return [];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -69,5 +71,3 @@ class GenericMessage extends Notification implements ShouldQueue
         ];
     }
 }
-
-
