@@ -19,7 +19,7 @@
                 <td class="p-2">{{ optional($e->project)->title }}</td>
                 <td class="p-2">{{ number_format($e->amount,2) }}</td>
                 <td class="p-2">{{ $e->description }}</td>
-                    <td class="p-2">{{ optional($e->category)->name }}</td>
+                <td class="p-2">{{ optional($e->category)->name }}</td>
                 <td class="p-2 text-right">
                     <a href="{{ route('expenses.edit', $e) }}" class="text-blue-600">Edit</a>
                     <form action="{{ route('expenses.destroy', $e) }}" method="POST" class="inline" onsubmit="return confirm('Delete expense?')">

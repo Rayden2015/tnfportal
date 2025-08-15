@@ -15,6 +15,7 @@
         <a href="{{ route('volunteers.index') }}">Volunteers</a>
         <a href="{{ route('donations.index') }}">Donations</a>
         <a href="{{ route('expenses.index') }}">Expenses</a>
+        <a href="{{ route('expense_categories.index') }}">Expense Categories</a>
         <a href="{{ route('attendance.index') }}">Attendance</a>
         <a href="{{ route('message_templates.index') }}">Template Messages</a>
         <a href="{{ route('messages.create') }}">Messages</a>
