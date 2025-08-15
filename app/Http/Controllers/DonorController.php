@@ -28,7 +28,11 @@ class DonorController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $donor = Donor::create($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['donor_id' => $donor->id], 'created');
+    activity()
+        ->performedOn($donor)
+        ->causedBy(Auth::user())
+        ->withProperties(['request' => $request->all()])
+        ->log('Donor created');
     return redirect()->route('donors.index')->with('status', 'Donor created');
     }
 
@@ -47,14 +51,22 @@ class DonorController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $donor->update($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['donor_id' => $donor->id], 'updated');
+    activity()
+        ->performedOn($donor)
+        ->causedBy(Auth::user())
+        ->withProperties(['request' => $request->all()])
+        ->log('Donor updated');
     return redirect()->route('donors.index')->with('status', 'Donor updated');
     }
 
     public function destroy(Donor $donor)
     {
         $donor->delete();
-        \App\Http\Controllers\AuditController::logActivity(request(), ['donor_id' => $donor->id], 'deleted');
+        activity()
+            ->performedOn($donor)
+            ->causedBy(Auth::user())
+            ->withProperties(['request' => request()->all()])
+            ->log('Donor deleted');
         return back()->with('status', 'Donor deleted');
     }
 }

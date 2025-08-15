@@ -30,7 +30,11 @@ class ExpenseController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $expense = Expense::create($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['expense_id' => $expense->id], 'created');
+    activity()
+        ->performedOn($expense)
+        ->causedBy(Auth::user())
+        ->withProperties(['request' => $request->all()])
+        ->log('Expense recorded');
     return redirect()->route('expenses.index')->with('status', 'Expense recorded');
     }
 
@@ -49,14 +53,22 @@ class ExpenseController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $expense->update($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['expense_id' => $expense->id], 'updated');
+    activity()
+        ->performedOn($expense)
+        ->causedBy(Auth::user())
+        ->withProperties(['request' => $request->all()])
+        ->log('Expense updated');
     return redirect()->route('expenses.index')->with('status', 'Expense updated');
     }
 
     public function destroy(Expense $expense)
     {
         $expense->delete();
-        \App\Http\Controllers\AuditController::logActivity(request(), ['expense_id' => $expense->id], 'deleted');
+        activity()
+            ->performedOn($expense)
+            ->causedBy(Auth::user())
+            ->withProperties(['request' => request()->all()])
+            ->log('Expense deleted');
         return back()->with('status', 'Expense deleted');
     }
 }

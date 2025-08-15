@@ -30,7 +30,11 @@ class MessageTemplateController extends Controller
             'body' => $request->body,
             'tenant_id' => $request->user()->tenant_id ?? null,
         ]);
-        \App\Http\Controllers\AuditController::logActivity($request, ['template_id' => $template->id], 'created');
+        activity()
+            ->performedOn($template)
+            ->causedBy($request->user())
+            ->withProperties(['request' => $request->all()])
+            ->log('Message template created');
         return redirect()->route('message_templates.index')->with('success', 'Template created successfully.');
     }
 
@@ -55,7 +59,11 @@ class MessageTemplateController extends Controller
             'name' => $request->name,
             'body' => $request->body,
         ]);
-        \App\Http\Controllers\AuditController::logActivity($request, ['template_id' => $messageTemplate->id], 'updated');
+        activity()
+            ->performedOn($messageTemplate)
+            ->causedBy($request->user())
+            ->withProperties(['request' => $request->all()])
+            ->log('Message template updated');
         return redirect()->route('message_templates.index')->with('success', 'Template updated successfully.');
     }
 

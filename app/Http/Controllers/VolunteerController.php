@@ -28,9 +28,13 @@ class VolunteerController extends Controller
             'notes' => ['nullable','string'],
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
-    $volunteer = Volunteer::create($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['volunteer_id' => $volunteer->id], 'created');
-    return redirect()->route('volunteers.index')->with('status', 'Volunteer created');
+        $volunteer = Volunteer::create($data);
+        activity()
+            ->performedOn($volunteer)
+            ->causedBy(Auth::user())
+            ->withProperties(['request' => $request->all()])
+            ->log('Volunteer created');
+        return redirect()->route('volunteers.index')->with('status', 'Volunteer created');
     }
 
     public function edit(Volunteer $volunteer)
@@ -47,16 +51,24 @@ class VolunteerController extends Controller
             'notes' => ['nullable','string'],
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
-    $volunteer->update($data);
-    \App\Http\Controllers\AuditController::logActivity($request, ['volunteer_id' => $volunteer->id], 'updated');
-    return redirect()->route('volunteers.index')->with('status', 'Volunteer updated');
+        $volunteer->update($data);
+        activity()
+            ->performedOn($volunteer)
+            ->causedBy(Auth::user())
+            ->withProperties(['request' => $request->all()])
+            ->log('Volunteer updated');
+        return redirect()->route('volunteers.index')->with('status', 'Volunteer updated');
     }
 
     public function destroy(Volunteer $volunteer)
     {
-    $volunteer->delete();
-    \App\Http\Controllers\AuditController::logActivity(request(), ['volunteer_id' => $volunteer->id], 'deleted');
-    return back()->with('status', 'Volunteer deleted');
+        $volunteer->delete();
+        activity()
+            ->performedOn($volunteer)
+            ->causedBy(Auth::user())
+            ->withProperties(['request' => request()->all()])
+            ->log('Volunteer deleted');
+        return back()->with('status', 'Volunteer deleted');
     }
 }
 

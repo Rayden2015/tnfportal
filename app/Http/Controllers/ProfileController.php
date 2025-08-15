@@ -31,7 +31,11 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
         $request->user()->save();
-        \App\Http\Controllers\AuditController::logActivity($request, ['user_id' => $request->user()->id], 'profile-updated');
+        activity()
+            ->performedOn($request->user())
+            ->causedBy($request->user())
+            ->withProperties(['request' => $request->all()])
+            ->log('Profile updated');
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
@@ -44,12 +48,16 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-    $user = $request->user();
-    Auth::logout();
-    $user->delete();
-    \App\Http\Controllers\AuditController::logActivity($request, ['user_id' => $user->id], 'profile-deleted');
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    return Redirect::to('/');
+        $user = $request->user();
+        Auth::logout();
+        $user->delete();
+        activity()
+            ->performedOn($user)
+            ->causedBy($user)
+            ->withProperties(['request' => $request->all()])
+            ->log('Profile deleted');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return Redirect::to('/');
     }
 }

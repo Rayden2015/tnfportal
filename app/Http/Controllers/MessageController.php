@@ -98,7 +98,11 @@ class MessageController extends Controller
                     'channel' => $data['channel'],
                     'status' => 'sent',
                 ]);
-                \App\Http\Controllers\AuditController::logActivity($request, ['notifiable' => (array) $notifiable, 'subject' => $data['subject'] ?? '', 'channel' => $data['channel']], 'message-sent');
+                activity()
+                    ->performedOn($notifiable)
+                    ->causedBy(Auth::user())
+                    ->withProperties(['subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'request' => $request->all()])
+                    ->log('Message sent');
             }
         } catch (\Exception $e) {
             Log::error('MessageController@store: notification sending failed', ['error' => $e->getMessage()]);
@@ -110,7 +114,11 @@ class MessageController extends Controller
                     'channel' => $data['channel'],
                     'status' => 'failed',
                 ]);
-                \App\Http\Controllers\AuditController::logActivity($request, ['notifiable' => (array) $notifiable, 'subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'error' => $e->getMessage()], 'message-failed');
+                activity()
+                    ->performedOn($notifiable)
+                    ->causedBy(Auth::user())
+                    ->withProperties(['subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'error' => $e->getMessage(), 'request' => $request->all()])
+                    ->log('Message failed');
             }
         }
         return redirect()->back()->with('status', 'Messages queued');
