@@ -9,6 +9,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MessageTemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,7 @@ Route::middleware(['tenant','auth'])->group(function () {
 
         Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
         Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::resource('message_templates', MessageTemplateController::class);
     });
 
     // Volunteer read-only
