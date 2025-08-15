@@ -5,8 +5,15 @@
     <h1 class="text-2xl font-semibold text-gray-800 mb-6">Create Message Template</h1>
     <form action="{{ route('message_templates.store') }}" method="POST" class="bg-white shadow-lg rounded-xl p-6 space-y-6">
         @csrf
+         <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" name="name" id="name" required value="{{ old('name') }}" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200">
+            @error('name')
+                <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+            @enderror
+        </div>
         <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
             <input type="text" name="title" id="title" required value="{{ old('title') }}" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200">
             @error('title')
                 <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
@@ -26,7 +33,4 @@
         </div>
     </form>
 </div>
-@endsection
-        </form>
-    </div>
 @endsection

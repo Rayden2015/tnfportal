@@ -29,8 +29,9 @@ class ProjectController extends Controller
             'status' => ['required','in:draft,active,completed,cancelled'],
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
-    Project::create($data);
-        return redirect()->route('projects.index')->with('status', 'Project created');
+    $project = Project::create($data);
+    \App\Http\Controllers\AuditController::logActivity($request, ['project_id' => $project->id], 'created');
+    return redirect()->route('projects.index')->with('status', 'Project created');
     }
 
     public function edit(Project $project)
@@ -49,12 +50,14 @@ class ProjectController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $project->update($data);
-        return redirect()->route('projects.index')->with('status', 'Project updated');
+    \App\Http\Controllers\AuditController::logActivity($request, ['project_id' => $project->id], 'updated');
+    return redirect()->route('projects.index')->with('status', 'Project updated');
     }
 
     public function destroy(Project $project)
     {
         $project->delete();
+        \App\Http\Controllers\AuditController::logActivity(request(), ['project_id' => $project->id], 'deleted');
         return back()->with('status', 'Project deleted');
     }
 

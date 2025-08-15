@@ -25,12 +25,12 @@ class MessageTemplateController extends Controller
             'body' => 'required|string',
         ]);
 
-        MessageTemplate::create([
+        $template = MessageTemplate::create([
             'name' => $request->name,
             'body' => $request->body,
             'tenant_id' => $request->user()->tenant_id ?? null,
         ]);
-
+        \App\Http\Controllers\AuditController::logActivity($request, ['template_id' => $template->id], 'created');
         return redirect()->route('message_templates.index')->with('success', 'Template created successfully.');
     }
 
@@ -55,7 +55,7 @@ class MessageTemplateController extends Controller
             'name' => $request->name,
             'body' => $request->body,
         ]);
-
+        \App\Http\Controllers\AuditController::logActivity($request, ['template_id' => $messageTemplate->id], 'updated');
         return redirect()->route('message_templates.index')->with('success', 'Template updated successfully.');
     }
 

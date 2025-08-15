@@ -81,7 +81,6 @@ class MessageController extends Controller
         try {
             foreach ($notifiables as $notifiable) {
                 $personalizedBody = $data['body'] ?? '';
-
                 if (isset($notifiable->name)) {
                     $nameParts = explode(' ', trim($notifiable->name));
                     $firstName = $nameParts[0] ?? '';
@@ -89,11 +88,9 @@ class MessageController extends Controller
                     $personalizedBody = str_replace('{first_name}', $firstName, $personalizedBody);
                     $personalizedBody = str_replace('{last_name}', $lastName, $personalizedBody);
                 }
-
                 $notification = new GenericMessage($data['subject'] ?? '', $personalizedBody, $data['channel']);
                 Log::debug('MessageController@store: notifying', ['notifiable' => (array) $notifiable]);
                 Notification::send($notifiable, $notification);
-
                 Message::create([
                     'tenant_id' => $data['tenant_id'],
                     'subject' => $data['subject'] ?? '',
@@ -101,6 +98,7 @@ class MessageController extends Controller
                     'channel' => $data['channel'],
                     'status' => 'sent',
                 ]);
+                \App\Http\Controllers\AuditController::logActivity($request, ['notifiable' => (array) $notifiable, 'subject' => $data['subject'] ?? '', 'channel' => $data['channel']], 'message-sent');
             }
         } catch (\Exception $e) {
             Log::error('MessageController@store: notification sending failed', ['error' => $e->getMessage()]);
@@ -112,9 +110,9 @@ class MessageController extends Controller
                     'channel' => $data['channel'],
                     'status' => 'failed',
                 ]);
+                \App\Http\Controllers\AuditController::logActivity($request, ['notifiable' => (array) $notifiable, 'subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'error' => $e->getMessage()], 'message-failed');
             }
         }
-
         return redirect()->back()->with('status', 'Messages queued');
     }
 }

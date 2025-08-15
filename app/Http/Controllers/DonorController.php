@@ -27,8 +27,9 @@ class DonorController extends Controller
             'phone' => ['nullable','string','max:30'],
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
-    Donor::create($data);
-        return redirect()->route('donors.index')->with('status', 'Donor created');
+    $donor = Donor::create($data);
+    \App\Http\Controllers\AuditController::logActivity($request, ['donor_id' => $donor->id], 'created');
+    return redirect()->route('donors.index')->with('status', 'Donor created');
     }
 
     public function edit(Donor $donor)
@@ -46,12 +47,14 @@ class DonorController extends Controller
         ]);
     $data['tenant_id'] = Auth::user()->tenant_id;
     $donor->update($data);
-        return redirect()->route('donors.index')->with('status', 'Donor updated');
+    \App\Http\Controllers\AuditController::logActivity($request, ['donor_id' => $donor->id], 'updated');
+    return redirect()->route('donors.index')->with('status', 'Donor updated');
     }
 
     public function destroy(Donor $donor)
     {
         $donor->delete();
+        \App\Http\Controllers\AuditController::logActivity(request(), ['donor_id' => $donor->id], 'deleted');
         return back()->with('status', 'Donor deleted');
     }
 }
