@@ -31,7 +31,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                <input name="currency" value="GHS" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200" />
+                <input name="currency" value="GHS" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200" disabled/>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>

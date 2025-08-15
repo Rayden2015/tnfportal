@@ -41,7 +41,6 @@ require __DIR__.'/auth.php';
 // Tenant-scoped and auth-protected routes
 Route::middleware(['tenant','auth'])->group(function () {
     // Admin-only routes
-    Route::middleware('role:tenant_admin')->group(function () {
         Route::resource('donors', DonorController::class)->except(['show']);
         Route::resource('volunteers', VolunteerController::class)->except(['show']);
         Route::resource('projects', ProjectController::class)->except(['show']);
@@ -52,7 +51,6 @@ Route::middleware(['tenant','auth'])->group(function () {
         Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
         Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
         Route::resource('message_templates', MessageTemplateController::class);
-    });
 
     // Volunteer read-only
     Route::get('/my/attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my');

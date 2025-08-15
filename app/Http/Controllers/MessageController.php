@@ -30,7 +30,7 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-                'subject' => ['nullable','string','max:255'],
+                'subject'     => ['required_if:channel,mail', 'nullable', 'string', 'max:255'],
                 'body' => ['nullable','string'],
                 'channel' => ['required','in:mail,sms'],
                 'volunteer_ids' => ['array'],

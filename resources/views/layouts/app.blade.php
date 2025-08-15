@@ -19,6 +19,11 @@
         <a href="{{ route('message_templates.index') }}">Template Messages</a>
         <a href="{{ route('messages.create') }}">Messages</a>
         <a href="{{ route('attendance.my') }}">My Attendance</a>
+        <a href="{{ route('profile.edit') }}" class="ml-auto">Profile</a>
+        <form method="POST" action="{{ route('logout') }}" class="inline">
+            @csrf
+            <button type="submit" class="ml-2 text-red-600 hover:underline">Logout</button>
+        </form>
     @endauth
 </nav>
 <main class="p-6">

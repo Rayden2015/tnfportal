@@ -46,9 +46,11 @@ class GenericMessage extends Notification
             'status' => 'queued',
         ]);
 
+        // Escape body for email (preserve line breaks, special chars, links)
+        $escapedBody = nl2br(e($this->body));
         return (new MailMessage)
             ->subject($this->subject)
-            ->line($this->body);
+            ->line($escapedBody);
     }
 
     public function toSms(object $notifiable): array

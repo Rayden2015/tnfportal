@@ -5,13 +5,22 @@
     <form method="POST" action="{{ route('expenses.update', $expense) }}" class="bg-white shadow-lg rounded-xl p-6 space-y-6">
         @csrf
         @method('PUT')
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Project</label>
                 <select name="project_id" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200">
                     <option value="">-- Project --</option>
                     @foreach($projects as $project)
                         <option value="{{ $project->id }}" @selected(old('project_id', $expense->project_id) == $project->id)>{{ $project->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select name="expense_category_id" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200" required>
+                    <option value="">-- Category --</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" @selected(old('expense_category_id', $expense->expense_category_id) == $category->id)>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
