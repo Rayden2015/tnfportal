@@ -38,29 +38,15 @@ class DonationController extends Controller
         $donation = Donation::create($data);
         \Log::info('DonationController@store: Donation created', ['donation_id' => $donation->id, 'data' => $data]);
 
-        // Send thank you message to donor via email and SMS using Thank You template
+        // Send thank you message to donor via MessageController static method
         $donor = Donor::find($data['donor_id']);
         if ($donor) {
-            $template = \App\Models\MessageTemplate::where('name', 'Thank You')->where('tenant_id', $data['tenant_id'])->first();
-            if ($template) {
-                $subject = $template->subject ?? 'Thank You';
-                $body = $template->body ?? 'Thank you for your donation!';
-                // Personalize body
-                if (isset($donor->name)) {
-                    $nameParts = explode(' ', trim($donor->name));
-                    $firstName = $nameParts[0] ?? '';
-                    $lastName = $nameParts[1] ?? '';
-                    $body = str_replace('{first_name}', $firstName, $body);
-                    $body = str_replace('{last_name}', $lastName, $body);
-                }
-                \Log::info('DonationController@store: Sending thank you notification', ['donor_id' => $donor->id, 'subject' => $subject, 'body' => $body]);
-                // Send email
-                $donor->notify(new \App\Notifications\GenericMessage($subject, $body, 'mail'));
-                // Send SMS
-                $donor->notify(new \App\Notifications\GenericMessage($subject, $body, 'sms'));
-            } else {
-                \Log::warning('DonationController@store: Thank You template not found', ['tenant_id' => $data['tenant_id']]);
-            }
+            \App\Http\Controllers\MessageController::sendPersonalizedMessage(
+                $donor,
+                'Thank You',
+                ['mail', 'sms'],
+                $data['tenant_id']
+            );
         } else {
             \Log::warning('DonationController@store: Donor not found', ['donor_id' => $data['donor_id']]);
         }

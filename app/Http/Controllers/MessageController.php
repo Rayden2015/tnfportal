@@ -18,6 +18,32 @@ use App\Models\MessageTemplate;
 
 class MessageController extends Controller
 {
+    /**
+     * Send a personalized message using a template to a recipient via mail/sms.
+     */
+    public static function sendPersonalizedMessage($recipient, $templateName, $channels = ['mail', 'sms'], $tenantId = null)
+    {
+        $template = \App\Models\MessageTemplate::where('name', $templateName)
+            ->where('tenant_id', $tenantId)->first();
+
+        $subject = $template->subject ?? 'Thank You';
+        $body = $template->body ?? 'Thank you for your donation!';
+
+        $recipientName = isset($recipient->name) && $recipient->name ? $recipient->name : 'Sponsor/Donor';
+        $body = str_replace('{name}', $recipientName, $body);
+
+        if (isset($recipient->name)) {
+            $nameParts = explode(' ', trim($recipient->name));
+            $firstName = $nameParts[0] ?? '';
+            $lastName = count($nameParts) > 1 ? $nameParts[count($nameParts)-1] : '';
+            $body = str_replace(['{firstname}', '{first_name}'], $firstName, $body);
+            $body = str_replace(['{lastname}', '{last_name}'], $lastName, $body);
+        }
+
+        foreach ((array)$channels as $ch) {
+            $recipient->notify(new \App\Notifications\GenericMessage($subject, $body, $ch));
+        }
+    }
     public function create()
     {
         $volunteers = class_exists(Volunteer::class) ? Volunteer::query()->select('id','name','email','phone')->get() : collect();
@@ -81,12 +107,14 @@ class MessageController extends Controller
         try {
             foreach ($notifiables as $notifiable) {
                 $personalizedBody = $data['body'] ?? '';
+                $recipientName = isset($notifiable->name) && $notifiable->name ? $notifiable->name : (method_exists($notifiable, 'getRoleName') ? $notifiable->getRoleName() : 'Sponsor/Donor');
+                $personalizedBody = str_replace('{name}', $recipientName, $personalizedBody);
                 if (isset($notifiable->name)) {
                     $nameParts = explode(' ', trim($notifiable->name));
                     $firstName = $nameParts[0] ?? '';
-                    $lastName = $nameParts[1] ?? '';
-                    $personalizedBody = str_replace('{first_name}', $firstName, $personalizedBody);
-                    $personalizedBody = str_replace('{last_name}', $lastName, $personalizedBody);
+                    $lastName = count($nameParts) > 1 ? $nameParts[count($nameParts)-1] : '';
+                    $personalizedBody = str_replace(['{firstname}', '{first_name}'], $firstName, $personalizedBody);
+                    $personalizedBody = str_replace(['{lastname}', '{last_name}'], $lastName, $personalizedBody);
                 }
                 $notification = new GenericMessage($data['subject'] ?? '', $personalizedBody, $data['channel']);
                 Log::debug('MessageController@store: notifying', ['notifiable' => (array) $notifiable]);
@@ -98,11 +126,12 @@ class MessageController extends Controller
                     'channel' => $data['channel'],
                     'status' => 'sent',
                 ]);
-                activity()
-                    ->performedOn($notifiable)
-                    ->causedBy(Auth::user())
-                    ->withProperties(['subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'request' => $request->all()])
-                    ->log('Message sent');
+                $activity = activity()->causedBy(Auth::user())
+                    ->withProperties(['subject' => $data['subject'] ?? '', 'channel' => $data['channel'], 'request' => $request->all()]);
+                if ($notifiable instanceof \Illuminate\Database\Eloquent\Model) {
+                    $activity->performedOn($notifiable);
+                }
+                $activity->log('Message sent');
             }
         } catch (\Exception $e) {
             Log::error('MessageController@store: notification sending failed', ['error' => $e->getMessage()]);

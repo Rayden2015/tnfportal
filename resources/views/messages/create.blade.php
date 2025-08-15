@@ -32,6 +32,17 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Body</label>
             <textarea name="body" id="body" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200" rows="5"></textarea>
+<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: '#body',
+        menubar: false,
+        plugins: 'link lists',
+        toolbar: 'undo redo | bold italic underline | bullist numlist | link',
+        branding: false,
+        height: 300
+    });
+</script>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

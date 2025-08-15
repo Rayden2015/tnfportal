@@ -16,6 +16,18 @@
         <div>
             <label for="body" class="block text-sm font-medium text-gray-700 mb-1">Template Body</label>
             <textarea id="body" name="body" class="border rounded-lg p-2 w-full focus:ring focus:ring-blue-200">{{ old('body', $messageTemplate->body) }}</textarea>
+<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: '#body',
+        menubar: false,
+        plugins: 'link lists',
+        toolbar: 'undo redo | bold italic underline | bullist numlist | link',
+        branding: false,
+        height: 300
+    });
+</script>
+            <div class="text-xs text-gray-500 mt-2">You can use <code>{name}</code>, <code>{firstname}</code>, <code>{lastname}</code> as placeholders for personalization.</div>
             @error('body')
                 <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
             @enderror

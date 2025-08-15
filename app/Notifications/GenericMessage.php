@@ -46,11 +46,12 @@ class GenericMessage extends Notification
             'status' => 'queued',
         ]);
 
-        // Escape body for email (preserve line breaks, special chars, links)
-        $escapedBody = nl2br(e($this->body));
+        // Render body as HTML (allow HTML tags)
         return (new MailMessage)
             ->subject($this->subject)
-            ->line($escapedBody);
+            ->view('emails.generic_message', [
+                'body' => $this->body
+            ]);
     }
 
     public function toSms(object $notifiable): array
@@ -67,9 +68,11 @@ class GenericMessage extends Notification
             'status' => 'queued',
         ]);
 
+        // Strip HTML tags for SMS
+        $plainBody = strip_tags($this->body);
         return [
             'to' => $recipient,
-            'message' => $this->body,
+            'message' => $plainBody,
         ];
     }
 }

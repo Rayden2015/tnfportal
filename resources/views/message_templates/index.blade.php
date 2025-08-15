@@ -7,6 +7,7 @@
         <a href="{{ route('message_templates.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
             Create New Template
         </a>
+        <div class="text-xs text-gray-500 mt-2">You can use <code>{name}</code>, <code>{firstname}</code>, <code>{lastname}</code> as placeholders for personalization.</div>
     </div>
 
     @if (session('success'))
